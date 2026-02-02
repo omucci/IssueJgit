@@ -40,13 +40,6 @@ public class EcommerceAnalyticsService {
     @Autowired
     private EntityManager entityManager;
 
-    @Value("${ecommerce.api.url}")
-    private String ECOMMERCE_API_URL;
-    @Value("${ecommerce.api.key}")
-    private String API_KEY;
-    @Value("${ecommerce.api.secret}")
-    private String API_SECRET;
-    
     private static final Logger logger = LogManager.getLogger(EcommerceAnalyticsService.class);
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -58,8 +51,14 @@ public class EcommerceAnalyticsService {
     private final ProductTagLinkRepository productTagLinkRepository;
     private final ProductPriceHistoryRepository priceHistoryRepository;
     private final JsonValidator jsonValidator;
+    private final String testApi;
+    private final String username;
+    private final String password;
 
-    public EcommerceAnalyticsService(@Qualifier("ecommerceRestTemplate") RestTemplate restTemplate, ObjectMapper objectMapper,  ProductCategoryRepository categoryRepository, ProductRepository productRepository, ProductCategoryLinkRepository categoryLinkRepository, CategoryManagerRepository categoryManagerRepository, ProductTagRepository productTagRepository,  ProductTagLinkRepository productTagLinkRepository,  ProductPriceHistoryRepository priceHistoryRepository, JsonValidator jsonValidator) {
+    public EcommerceAnalyticsService(@Value("${test.api}")String testApi, @Value("${test.username}")String username, @Value("${test.password}")String password,@Qualifier("ecommerceRestTemplate") RestTemplate restTemplate, ObjectMapper objectMapper,  ProductCategoryRepository categoryRepository, ProductRepository productRepository, ProductCategoryLinkRepository categoryLinkRepository, CategoryManagerRepository categoryManagerRepository, ProductTagRepository productTagRepository,  ProductTagLinkRepository productTagLinkRepository,  ProductPriceHistoryRepository priceHistoryRepository, JsonValidator jsonValidator) {
+    	this.testApi = testApi;
+        this.username = username;
+        this.password = password;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.categoryRepository = categoryRepository;
@@ -120,7 +119,7 @@ public class EcommerceAnalyticsService {
 
     private void processProductData(JsonNode responseNode) {
         try {
-        	String auth = USERNAME + ":" + PASSWORD;
+        	String auth = usernam + ":" + passwod;
             logger.info("Page info - Current: {}, Size: {}, Total Pages: {}, Total Items: {}",
                     responseNode.get("currentPage").asInt(),
                     responseNode.get("pageSize").asInt(),
@@ -128,7 +127,7 @@ public class EcommerceAnalyticsService {
                     responseNode.has("totalItems") ? responseNode.get("totalItems").asInt() : "N/A");
 
             // Extract and process product data
-            String url = TEST_API + "?offset=" + offset + "&limit=" + limit;
+            String url = testApi + "?offset=" + offset + "&limit=" + limit;
 
             if (itemsArray != null && itemsArray.isArray()) {
                 for (JsonNode productData : itemsArray) {
